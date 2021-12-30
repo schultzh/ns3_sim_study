@@ -1,0 +1,11 @@
+'1':
+  addresses:
+  - destinationaddress: 10.1.1.1
+    destinationport: '9'
+    protocol: '17'
+    sourceaddress: 10.1.1.25
+    sourceport: '49153'
+  packets:
+  - lostpackets: '901'
+    rxpackets: '0'
+    txpackets: '1000'
