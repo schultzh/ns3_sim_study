@@ -1,3 +1,5 @@
+/* https://github.com/tonmoy71/ns3-scratch */
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -67,7 +69,7 @@ void setPhy(YansWifiPhyHelper &wifiPhy)
 {
 	wifiPhy.Set ("TxPowerStart", DoubleValue(1000.0));
 	wifiPhy.Set ("TxPowerEnd", DoubleValue(1000.0));
-	wifiPhy.Set ("TxPowerLevels", UintegerValue(150));
+	wifiPhy.Set ("TxPowerLevels", UintegerValue(100));
 	wifiPhy.Set ("TxGain", DoubleValue(1000.0));
 	wifiPhy.Set ("RxGain", DoubleValue(1000.0));
 	// wifiPhy.Set ("EnergyDetectionThreshold", DoubleValue(-60));
@@ -175,9 +177,9 @@ int main (int argc, char *argv[])
 	
 	//-----------------------------------INSTALL INTERNET STACK AND ADDRESSES
 	
-        AnimationInterface animation ("mesh-tcp.xml");
+        // AnimationInterface animation ("mesh-tcp.xml");
         
-        animation.EnablePacketMetadata(false);
+        // animation.EnablePacketMetadata(false);
         
 	InternetStackHelper stack;
 	stack.Install (genMesh);
@@ -216,9 +218,13 @@ int main (int argc, char *argv[])
 		NS_LOG_UNCOND("Rx Packets = " << iter->second.rxPackets);
 		NS_LOG_UNCOND("Throughput: " << iter->second.rxBytes * 8.0 / (iter->second.timeLastRxPacket.GetSeconds()-iter->second.timeFirstTxPacket.GetSeconds()) / packetSize  << " Kbps");
     }
-	// flowMonitor->SerializeToXmlFile("mesh-TCP-results.xml", true, true);
+
+	monitor->SerializeToXmlFile("mesh-TCP-results.xml", true, true);
 	
 	Simulator::Destroy ();
 	return 0;
 	
 }
+
+	
+	
