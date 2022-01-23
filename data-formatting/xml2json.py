@@ -10,7 +10,7 @@ import xmltodict
 # open the input xml file and read
 # data in form of python dictionary
 # using xmltodict module
-with open("meshFlow.xml") as xml_file:
+with open("chunk_FlowMon.xml") as xml_file:
      
     data_dict = xmltodict.parse(xml_file.read())
     xml_file.close()
@@ -22,6 +22,6 @@ with open("meshFlow.xml") as xml_file:
      
     # Write the json data to output
     # json file
-    with open("meshFlow.json", "w") as json_file:
+    with open("chunk_FlowMon.json", "w") as json_file:
         json_file.write(json_data)
         json_file.close()

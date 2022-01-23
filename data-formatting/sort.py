@@ -7,7 +7,7 @@ def main():
     
     flows = {}
 
-    with open("meshFlow.json", "r") as fh: #input json file name
+    with open("chunk_FlowMon.json", "r") as fh: #input json file name
         data = json.load(fh)["FlowMonitor"] #load top dict
         
     #combine subdicts
@@ -30,7 +30,7 @@ def main():
         except AttributeError:
             flows[flow["@flowId"]]["packets"].append(dict(f))
     
-    with open("flows.yaml","w") as fh: # output file
+    with open("chunnk_flows.yaml","w") as fh: # output file
         yaml.dump(flows,fh,indent=2)
     
 if __name__=="__main__":
