@@ -20,6 +20,7 @@
 #include "ns3/mesh-module.h"
 #include "ns3/mesh-helper.h"
 #include "ns3/wifi-module.h"
+#include "ns3/olsr-helper.h"
 
 // flow monitor modules
 #include "ns3/flow-monitor.h"
@@ -61,15 +62,19 @@ NodeContainer genMesh;
 genMesh.Create(m_ySize*m_xSize);
 NetDeviceContainer genMeshDevice;
 
-// Wifi Helpers
-WifiMacHelper wifiMac;
-WifiHelper wifiHelper;
-wifiHelper.SetStandard (WIFI_STANDARD_80211b);
-
 // Physical Layer
 YansWifiPhyHelper wifiPhy;
 YansWifiChannelHelper wifiChannel = YansWifiChannelHelper::Default ();
 wifiPhy.SetChannel (wifiChannel.Create ());
+
+// Wifi Helpers
+WifiHelper wifiHelper;
+wifiHelper.SetStandard (WIFI_STANDARD_80211b);
+wifiHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager",
+                                "DataMode", StringValue ("OfdmRate54Mbps"));
+
+WifiMacHelper wifiMac;
+wifiMac.SetType ("ns3::MeshWifiInterfaceMac");            
 
 // Configure Nodes with Wifi
 genMeshDevice = wifiHelper.Install(wifiPhy, wifiMac, genMesh);
@@ -110,14 +115,15 @@ MobilityHelper mobility;
 								   "DeltaY", DoubleValue (m_step),
 								   "GridWidth", UintegerValue (m_xSize),
 								   "LayoutType", StringValue ("RowFirst"));
-    mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel"); 
-    //mobility.SetMobilityModel ("ns3::RandomWalk2dMobilityModel",
-        //"Bounds", RectangleValue (Rectangle (50, 200, 50, 200)));                                  
+    mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");                                   
 	mobility.Install (genMesh);
 
 // Internet Stack
+// OlsrHelper olsr;
 InternetStackHelper stack;
+// stack.SetRoutingHelper (olsr);
 stack.Install (genMesh);
+
 
 // Assign addresses
 Ipv4AddressHelper address;
@@ -131,20 +137,20 @@ tcpVariant = std::string ("ns3::") + tcpVariant;
 Ptr<Socket> ns3TcpSocket = Socket::CreateSocket (genMesh.Get (0), TcpSocketFactory::GetTypeId ());
 
 // OnOffHelper
-OnOffHelper onOffHelper ("ns3::TcpSocketFactory", Address ());
-onOffHelper.SetAttribute ("PacketSize", UintegerValue (m_packetSize));
-onOffHelper.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=1]"));
-onOffHelper.SetAttribute ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
-onOffHelper.SetAttribute ("DataRate", DataRateValue (DataRate (dataRate)));
-// onOffHelper.SetAttribute ("Interval", TimeValue (Seconds (m_packetInterval)));
+OnOffHelper onOff ("ns3::TcpSocketFactory", InetSocketAddress (ic.GetAddress (0)));
+onOff.SetAttribute ("PacketSize", UintegerValue (m_packetSize));
+onOff.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=1]"));
+onOff.SetAttribute ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
+onOff.SetAttribute ("DataRate", DataRateValue (DataRate (dataRate)));
+ApplicationContainer meshApp = onOff.Install(genMesh); 
  
-
-// Install application
-ApplicationContainer meshApp;
 uint16_t port = 8080;
-
 //Address node1 (InetSocketAddress (Ipv4Address::GetAny (), port));
-//PacketSinkHelper packetSinkHelper ("ns3::TcpSocketFactory", node1);
+PacketSinkHelper pSink ("ns3::TcpSocketFactory",
+                      InetSocketAddress (Ipv4Address::GetAny (), port));
+meshApp = pSink.Install(genMesh);
+// Install application
+// ApplicationContainer meshApp;
 
 // star TCP example logic
 // each node sends packets to the next node
@@ -152,14 +158,15 @@ for (uint32_t i = 0; i < (m_ySize*m_xSize); ++i)
     {
         if (i < ((m_ySize*m_xSize)-1)) {
             AddressValue remoteAddress (InetSocketAddress (ic.GetAddress(i + 1), port)); 
-            onOffHelper.SetAttribute ("Remote", remoteAddress);
-            meshApp.Add (onOffHelper.Install (genMesh.Get (i)));
+            onOff.SetAttribute ("Remote", remoteAddress);
+            meshApp.Add (onOff.Install (genMesh.Get (i)));
         }
         
     }
-
     meshApp.Start (Seconds (0));
     meshApp.Stop (Seconds (m_totalTime));
+
+
 
 // Install FlowMonitor
 FlowMonitorHelper flowmon;
