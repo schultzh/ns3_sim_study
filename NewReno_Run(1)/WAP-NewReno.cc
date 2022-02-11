@@ -42,7 +42,7 @@ CalculateThroughput ()
   avgThroughput.open("NewReno-throughput.csv", std::ios_base::app);
   Time now = Simulator::Now (); 
   double cur = (sink->GetTotalRx () - lastTotalRx) * (double) 8 / 1e5;     /* Convert Application RX Packets to MBits. */
-  avgThroughput << now.GetSeconds () << "s:, \t" << cur << ", Mbit/s" << std::endl;
+  avgThroughput << now.GetSeconds () << "," << cur << ", Mbit/s" << std::endl;
   lastTotalRx = sink->GetTotalRx ();
   Simulator::Schedule (MilliSeconds (100), &CalculateThroughput);
   avgThroughput.close();
@@ -52,13 +52,13 @@ int
 main (int argc, char *argv[])
 {
   uint32_t payloadSize = 1472;                       /* Transport layer payload size in bytes. */
-  std::string dataRate = "100Mbps";                  /* Application layer datarate. */
-  std::string tcpVariant = "TcpNewReno";             /* TCP variant type. */
+  std::string dataRate = "100Mbps";                  /* Application layer datarate. */  
   std::string phyRate = "HtMcs7";                    /* Physical layer bitrate. */
   double simulationTime = 10;
-  
+
 
 /* Configure TCP Options */
+  Config::SetDefault ("ns3::TcpL4Protocol::SocketType", TypeIdValue (TypeId::LookupByName ("ns3::TcpNewReno")));
   Config::SetDefault ("ns3::TcpSocket::SegmentSize", UintegerValue (payloadSize));
 
   WifiMacHelper wifiMac;
@@ -134,12 +134,12 @@ mobility.SetPositionAllocator ("ns3::GridPositionAllocator",
   Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
   /* Install TCP Receiver on the access point */
-  PacketSinkHelper sinkHelper ("ns3::TcpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), 9));
+  PacketSinkHelper sinkHelper ("ns3::TcpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), 8080));
   ApplicationContainer sinkApp = sinkHelper.Install (APNodes);
   sink = StaticCast<PacketSink> (sinkApp.Get (0));
 
   /* Install TCP/UDP Transmitter on the station */
-  OnOffHelper server ("ns3::TcpSocketFactory", (InetSocketAddress (apInterface.GetAddress (0), 9)));
+  OnOffHelper server ("ns3::TcpSocketFactory", (InetSocketAddress (apInterface.GetAddress (0), 8080)));
   server.SetAttribute ("PacketSize", UintegerValue (payloadSize));
   server.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=1]"));
   server.SetAttribute ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
