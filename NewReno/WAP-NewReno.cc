@@ -34,12 +34,24 @@ using namespace ns3;
 Ptr<PacketSink> sink;                         /* Pointer to the packet sink application */
 uint64_t lastTotalRx = 0;                     /* The value of the last total received bytes */
 
+std::string datetime()
+{
+    time_t rawtime;
+    struct tm * timeinfo;
+    char buffer[80];
+
+    time (&rawtime);
+    timeinfo = localtime(&rawtime);
+
+    strftime(buffer,80,"%d-%m-%Y %H-%M-%S",timeinfo);
+    return std::string(buffer);
+}
 
 void
 CalculateThroughput ()
 {
   std::ofstream avgThroughput;
-  avgThroughput.open("NewReno-throughput.csv", std::ios_base::app);
+  avgThroughput.open(datetime()+"NR_throughput.csv", std::ios_base::app);
   Time now = Simulator::Now (); 
   double cur = (sink->GetTotalRx () - lastTotalRx) * (double) 8 / 1e5;     /* Convert Application RX Packets to MBits. */
   avgThroughput << now.GetSeconds () << "," << cur << ", Mbit/s" << std::endl;
@@ -159,8 +171,8 @@ mobility.SetPositionAllocator ("ns3::GridPositionAllocator",
   Simulator::Stop (Seconds (simulationTime + 1));
   Simulator::Run ();
 
-  monitor->SerializeToXmlFile("WAP-NewReno_FlowMon.xml", true, true);
-  AnimationInterface anim("WAP-NewReno.xml");
+  monitor->SerializeToXmlFile(datetime()+"_NR_FlowMon.xml", true, true);
+  AnimationInterface anim(datetime()+"_NR.xml");
 
   Simulator::Destroy ();
   
