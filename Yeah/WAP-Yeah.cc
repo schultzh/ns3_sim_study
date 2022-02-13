@@ -172,7 +172,7 @@ mobility.SetPositionAllocator ("ns3::GridPositionAllocator",
   Simulator::Run ();
 
   monitor->SerializeToXmlFile(datetime()+"_Yeah_FlowMon.xml", true, true);
-  AnimationInterface anim(datetime()"_Yeah.xml");
+  AnimationInterface anim(datetime()+"_Yeah.xml");
 
   Simulator::Destroy ();
   
