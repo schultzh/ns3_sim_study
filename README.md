@@ -1,4 +1,4 @@
-# ns3_sim_study
+# An ns3 Simulation Study of End-to-End TCP Variants
 
 The transition from wired to wireless networks did not account for
 the original design of Transmission Control Protocols (TCP/IP) where wireless behavior
@@ -12,3 +12,6 @@ the same original variant of Reno, causing their behavior in simulation to be ex
 jitter measure, the amount by which the measure is less is not significant enough to be confident. This means that the results
 of the testing in this research are inconclusive, where New Reno, YeAH, and HighSpeed do not outperform each other based on the performance metrics used and the simulations performed.
 Future work includes running these tests on a real network in order to compare the performance to the ns3 simulations.
+
+
+This repository contains the materials that go alongside my senior thesis.
