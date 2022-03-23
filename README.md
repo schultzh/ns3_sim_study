@@ -14,4 +14,4 @@ of the testing in this research are inconclusive, where New Reno, YeAH, and High
 Future work includes running these tests on a real network in order to compare the performance to the ns3 simulations.
 
 
-This repository contains the materials that go alongside my senior thesis.
+**This repository contains the materials that go alongside my senior thesis.**
